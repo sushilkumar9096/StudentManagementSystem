@@ -16,7 +16,6 @@ namespace Student.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // Student Entity Configuration
             modelBuilder.Entity<Core.Entities.Student>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -28,7 +27,6 @@ namespace Student.Infrastructure.Data
                 entity.Property(e => e.CreatedDate).HasDefaultValueSql("GETUTCDATE()");
             });
 
-            // User Entity Configuration
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -41,7 +39,6 @@ namespace Student.Infrastructure.Data
                 entity.Property(e => e.CreatedDate).HasDefaultValueSql("GETUTCDATE()");
             });
 
-            // Seed Initial Data (10 Student Records)
             modelBuilder.Entity<Core.Entities.Student>().HasData(
                 new Core.Entities.Student
                 {
@@ -135,7 +132,6 @@ namespace Student.Infrastructure.Data
                 }
             );
 
-            // Seed Default Admin User (Password: Admin@123)
             var adminPasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123");
             modelBuilder.Entity<User>().HasData(
                 new User

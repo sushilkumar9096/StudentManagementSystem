@@ -18,7 +18,6 @@ namespace Student.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // 1. Configure Serilog Logging
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
                 .Enrich.FromLogContext()
@@ -26,10 +25,8 @@ namespace Student.Api
 
             builder.Host.UseSerilog();
 
-            // 2. Add Controllers
             builder.Services.AddControllers();
 
-            // 3. Configure Database Context (SQL Server with SQLite fallback for seamless execution)
             bool useSqlite = builder.Configuration.GetValue<bool>("UseSqlite");
             string defaultConnectionString = builder.Configuration.GetConnectionString("DefaultConnection") ?? "";
             string sqliteConnectionString = builder.Configuration.GetConnectionString("SqliteConnection") ?? "Data Source=student_management.db";
@@ -54,13 +51,11 @@ namespace Student.Api
                     }
                     catch
                     {
-                        // Fallback to SQLite if SQL Server connection setup fails
                         options.UseSqlite(sqliteConnectionString);
                     }
                 }
             });
 
-            // 4. Register Dependency Injection Services & Repositories
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             builder.Services.AddScoped<IStudentRepository, StudentRepository>();
             builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -68,7 +63,6 @@ namespace Student.Api
             builder.Services.AddScoped<IAuthService, AuthService>();
             builder.Services.AddScoped<IJwtTokenGenerator, JwtTokenGenerator>();
 
-            // 5. Configure JWT Authentication
             var jwtKey = builder.Configuration["Jwt:Key"] ?? "ZestIndiaTechnicalAssignmentSecretKeyForJWTAuth2026!";
             var jwtIssuer = builder.Configuration["Jwt:Issuer"] ?? "StudentApi";
             var jwtAudience = builder.Configuration["Jwt:Audience"] ?? "StudentApiClients";
@@ -93,7 +87,6 @@ namespace Student.Api
                 };
             });
 
-            // 6. Configure Swagger with JWT Bearer Token Security
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen(c =>
             {
@@ -104,7 +97,6 @@ namespace Student.Api
                     Description = "RESTful API for Student Management System - Zest India Technical Assignment"
                 });
 
-                // Add JWT Security Definition to Swagger UI
                 c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     Name = "Authorization",
@@ -131,7 +123,6 @@ namespace Student.Api
                 });
             });
 
-            // 7. Enable CORS for Web UI
             builder.Services.AddCors(options =>
             {
                 options.AddPolicy("AllowAll", policy =>
@@ -144,7 +135,6 @@ namespace Student.Api
 
             var app = builder.Build();
 
-            // 8. Auto-migrate/Ensure Database Created and Seeded with 10 Students
             using (var scope = app.Services.CreateScope())
             {
                 try
@@ -152,7 +142,6 @@ namespace Student.Api
                     var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
                     dbContext.Database.EnsureCreated();
 
-                    // Seed all 10 students if not present
                     var seedStudents = new List<Core.Entities.Student>
                     {
                         new Core.Entities.Student { Name = "Aarav Sharma", Email = "aarav.sharma@example.com", Age = 21, Course = "Computer Science", CreatedDate = new DateTime(2026, 1, 15, 0, 0, 0, DateTimeKind.Utc) },
@@ -188,10 +177,8 @@ namespace Student.Api
                 }
             }
 
-            // 9. Exception Handling Middleware
             app.UseMiddleware<ExceptionMiddleware>();
 
-            // 10. HTTP Pipeline Configuration
             app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
@@ -199,7 +186,7 @@ namespace Student.Api
                 c.RoutePrefix = "swagger";
             });
 
-            app.UseStaticFiles(); // For serving Web UI
+            app.UseStaticFiles();
             app.UseCors("AllowAll");
             app.UseHttpsRedirection();
 

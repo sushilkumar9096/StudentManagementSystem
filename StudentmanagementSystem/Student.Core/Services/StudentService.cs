@@ -35,7 +35,6 @@ namespace Student.Core.Services
 
         public async Task<ApiResponse<StudentDto>> CreateStudentAsync(CreateStudentDto createDto)
         {
-            // Check for duplicate email
             var existingStudent = await _studentRepository.GetByEmailAsync(createDto.Email);
             if (existingStudent != null)
             {
@@ -63,7 +62,6 @@ namespace Student.Core.Services
                 throw new NotFoundException($"Student with ID {id} was not found.");
             }
 
-            // Check if email belongs to another student
             var studentWithEmail = await _studentRepository.GetByEmailAsync(updateDto.Email);
             if (studentWithEmail != null && studentWithEmail.Id != id)
             {

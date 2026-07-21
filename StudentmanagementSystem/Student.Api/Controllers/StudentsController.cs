@@ -19,12 +19,6 @@ namespace Student.Api.Controllers
             _studentService = studentService;
         }
 
-        /// <summary>
-        /// Get all students (Supports search and filtering)
-        /// </summary>
-        /// <param name="searchTerm">Filter by name or email</param>
-        /// <param name="course">Filter by course</param>
-        /// <returns>List of students</returns>
         [HttpGet]
         [ProducesResponseType(typeof(ApiResponse<IEnumerable<StudentDto>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll([FromQuery] string? searchTerm, [FromQuery] string? course)
@@ -33,11 +27,6 @@ namespace Student.Api.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Get student by unique ID
-        /// </summary>
-        /// <param name="id">Student ID</param>
-        /// <returns>Student details</returns>
         [HttpGet("{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<StudentDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]
@@ -47,11 +36,6 @@ namespace Student.Api.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Add a new student record
-        /// </summary>
-        /// <param name="createDto">Student creation data</param>
-        /// <returns>Created student details</returns>
         [HttpPost]
         [ProducesResponseType(typeof(ApiResponse<StudentDto>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -68,12 +52,6 @@ namespace Student.Api.Controllers
             return CreatedAtAction(nameof(GetById), new { id = result.Data?.Id }, result);
         }
 
-        /// <summary>
-        /// Update an existing student record
-        /// </summary>
-        /// <param name="id">Student ID</param>
-        /// <param name="updateDto">Updated student data</param>
-        /// <returns>Updated student details</returns>
         [HttpPut("{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<StudentDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -91,11 +69,6 @@ namespace Student.Api.Controllers
             return Ok(result);
         }
 
-        /// <summary>
-        /// Delete a student by ID
-        /// </summary>
-        /// <param name="id">Student ID</param>
-        /// <returns>Success status</returns>
         [HttpDelete("{id:int}")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status404NotFound)]

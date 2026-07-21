@@ -23,7 +23,6 @@ namespace Student.Tests
         [Fact]
         public async Task GetAllStudentsAsync_ShouldReturnListOfStudents()
         {
-            // Arrange
             var students = new List<Core.Entities.Student>
             {
                 new Core.Entities.Student { Id = 1, Name = "Aarav Sharma", Email = "aarav@test.com", Age = 21, Course = "Computer Science", CreatedDate = DateTime.UtcNow },
@@ -33,20 +32,17 @@ namespace Student.Tests
             _mockStudentRepository.Setup(r => r.SearchStudentsAsync(It.IsAny<string?>(), It.IsAny<string?>()))
                 .ReturnsAsync(students);
 
-            // Act
             var response = await _studentService.GetAllStudentsAsync();
 
-            // Assert
             response.Should().NotBeNull();
             response.Success.Should().BeTrue();
             response.Data.Should().HaveCount(2);
-            response.Data.First().Name.Should().Be("Aarav Sharma");
+            response.Data!.First().Name.Should().Be("Aarav Sharma");
         }
 
         [Fact]
         public async Task GetStudentByIdAsync_WhenStudentExists_ShouldReturnStudentDto()
         {
-            // Arrange
             var student = new Core.Entities.Student
             {
                 Id = 1,
@@ -59,10 +55,8 @@ namespace Student.Tests
 
             _mockStudentRepository.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(student);
 
-            // Act
             var response = await _studentService.GetStudentByIdAsync(1);
 
-            // Assert
             response.Should().NotBeNull();
             response.Success.Should().BeTrue();
             response.Data!.Id.Should().Be(1);
@@ -72,13 +66,10 @@ namespace Student.Tests
         [Fact]
         public async Task GetStudentByIdAsync_WhenStudentDoesNotExist_ShouldThrowNotFoundException()
         {
-            // Arrange
             _mockStudentRepository.Setup(r => r.GetByIdAsync(99)).ReturnsAsync((Core.Entities.Student?)null);
 
-            // Act
             Func<Task> act = async () => await _studentService.GetStudentByIdAsync(99);
 
-            // Assert
             await act.Should().ThrowAsync<NotFoundException>()
                 .WithMessage("*99*not found*");
         }
@@ -86,7 +77,6 @@ namespace Student.Tests
         [Fact]
         public async Task CreateStudentAsync_WithValidData_ShouldCreateStudent()
         {
-            // Arrange
             var createDto = new CreateStudentDto
             {
                 Name = "Vikram Singh",
@@ -99,10 +89,8 @@ namespace Student.Tests
             _mockStudentRepository.Setup(r => r.AddAsync(It.IsAny<Core.Entities.Student>()))
                 .ReturnsAsync((Core.Entities.Student s) => { s.Id = 10; return s; });
 
-            // Act
             var response = await _studentService.CreateStudentAsync(createDto);
 
-            // Assert
             response.Should().NotBeNull();
             response.Success.Should().BeTrue();
             response.StatusCode.Should().Be(201);
@@ -114,7 +102,6 @@ namespace Student.Tests
         [Fact]
         public async Task CreateStudentAsync_WithDuplicateEmail_ShouldThrowConflictException()
         {
-            // Arrange
             var createDto = new CreateStudentDto
             {
                 Name = "Vikram Singh",
@@ -126,10 +113,8 @@ namespace Student.Tests
             var existingStudent = new Core.Entities.Student { Id = 1, Email = "existing@test.com" };
             _mockStudentRepository.Setup(r => r.GetByEmailAsync("existing@test.com")).ReturnsAsync(existingStudent);
 
-            // Act
             Func<Task> act = async () => await _studentService.CreateStudentAsync(createDto);
 
-            // Assert
             await act.Should().ThrowAsync<ConflictException>()
                 .WithMessage("*already exists*");
         }
@@ -137,7 +122,6 @@ namespace Student.Tests
         [Fact]
         public async Task UpdateStudentAsync_WithValidData_ShouldUpdateStudent()
         {
-            // Arrange
             var existingStudent = new Core.Entities.Student
             {
                 Id = 1,
@@ -158,10 +142,8 @@ namespace Student.Tests
             _mockStudentRepository.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(existingStudent);
             _mockStudentRepository.Setup(r => r.GetByEmailAsync("aarav.updated@test.com")).ReturnsAsync((Core.Entities.Student?)null);
 
-            // Act
             var response = await _studentService.UpdateStudentAsync(1, updateDto);
 
-            // Assert
             response.Should().NotBeNull();
             response.Success.Should().BeTrue();
             response.Data!.Name.Should().Be("Aarav Sharma Updated");
@@ -172,14 +154,11 @@ namespace Student.Tests
         [Fact]
         public async Task DeleteStudentAsync_WhenStudentExists_ShouldDeleteStudent()
         {
-            // Arrange
             var existingStudent = new Core.Entities.Student { Id = 1, Name = "Aarav Sharma" };
             _mockStudentRepository.Setup(r => r.GetByIdAsync(1)).ReturnsAsync(existingStudent);
 
-            // Act
             var response = await _studentService.DeleteStudentAsync(1);
 
-            // Assert
             response.Should().NotBeNull();
             response.Success.Should().BeTrue();
             response.Data.Should().BeTrue();

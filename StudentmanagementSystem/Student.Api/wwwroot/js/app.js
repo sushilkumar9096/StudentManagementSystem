@@ -1,16 +1,11 @@
-// Student Management System - Client Application JavaScript
-
 document.addEventListener('DOMContentLoaded', () => {
-    // API Configuration
     const API_BASE = '/api';
 
-    // State
     let jwtToken = localStorage.getItem('jwt_token') || null;
     let currentUser = JSON.parse(localStorage.getItem('current_user') || 'null');
     let studentsCache = [];
     let studentToDeleteId = null;
 
-    // DOM Elements
     const authBtn = document.getElementById('auth-btn');
     const authStatusBadge = document.getElementById('auth-status-badge');
     const statusText = document.getElementById('status-text');
@@ -18,30 +13,25 @@ document.addEventListener('DOMContentLoaded', () => {
     const loggedUserName = document.getElementById('logged-user-name');
     const loggedUserRole = document.getElementById('logged-user-role');
 
-    // Metrics
     const metricTotalStudents = document.getElementById('metric-total-students');
     const metricTotalCourses = document.getElementById('metric-total-courses');
     const metricAvgAge = document.getElementById('metric-avg-age');
 
-    // Controls
     const searchInput = document.getElementById('search-input');
     const courseFilter = document.getElementById('course-filter');
     const refreshBtn = document.getElementById('refresh-btn');
     const addStudentBtn = document.getElementById('add-student-btn');
 
-    // Table
     const studentTableBody = document.getElementById('student-table-body');
     const tableLoading = document.getElementById('table-loading');
     const tableEmpty = document.getElementById('table-empty');
 
-    // Auth Modal
     const authModal = document.getElementById('auth-modal');
     const tabLogin = document.getElementById('tab-login');
     const tabRegister = document.getElementById('tab-register');
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
 
-    // Student Modal
     const studentModal = document.getElementById('student-modal');
     const studentForm = document.getElementById('student-form');
     const studentModalTitle = document.getElementById('student-modal-title');
@@ -51,12 +41,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const studentAgeInput = document.getElementById('student-age');
     const studentCourseInput = document.getElementById('student-course');
 
-    // Delete Modal
     const deleteModal = document.getElementById('delete-modal');
     const deleteStudentName = document.getElementById('delete-student-name');
     const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
 
-    // Initialize Application
     init();
 
     function init() {
@@ -82,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function bindEvents() {
-        // Auth Toggle
         authBtn.addEventListener('click', () => {
             if (jwtToken) {
                 logout();
@@ -91,7 +78,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        // Tabs
         tabLogin.addEventListener('click', () => {
             tabLogin.classList.add('active');
             tabRegister.classList.remove('active');
@@ -106,13 +92,11 @@ document.addEventListener('DOMContentLoaded', () => {
             loginForm.classList.add('hidden');
         });
 
-        // Forms
         loginForm.addEventListener('submit', handleLogin);
         registerForm.addEventListener('submit', handleRegister);
         studentForm.addEventListener('submit', handleSaveStudent);
         confirmDeleteBtn.addEventListener('click', handleConfirmDelete);
 
-        // Search & Filters
         let searchTimeout;
         searchInput.addEventListener('input', () => {
             clearTimeout(searchTimeout);
@@ -131,7 +115,6 @@ document.addEventListener('DOMContentLoaded', () => {
             openStudentModal();
         });
 
-        // Modal Close Listeners
         document.querySelectorAll('.close-modal-btn, .cancel-modal-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const backdrop = e.target.closest('.modal-backdrop');
@@ -140,7 +123,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // API Helper with JWT Header
     async function apiRequest(url, method = 'GET', body = null) {
         const headers = { 'Content-Type': 'application/json' };
         if (jwtToken) {
@@ -173,7 +155,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Fetch Students
     async function fetchStudents() {
         showLoading(true);
         try {
@@ -191,7 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
             renderTable(studentsCache);
             updateMetrics(studentsCache);
         } catch (err) {
-            console.warn('Fetch students notice:', err.message);
             if (!jwtToken) {
                 tableEmpty.innerHTML = `
                     <i class="fa-solid fa-lock empty-icon"></i>
@@ -202,7 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 tableEmpty.innerHTML = `
                     <i class="fa-solid fa-triangle-exclamation empty-icon"></i>
                     <h3>Error Loading Students</h3>
-                    <p>${err.message}</p>
+                    <p>${escapeHtml(err.message)}</p>
                 `;
             }
             studentTableBody.innerHTML = '';
@@ -275,7 +255,6 @@ document.addEventListener('DOMContentLoaded', () => {
             courses.map(c => `<option value="${escapeHtml(c)}" ${c === currentSelected ? 'selected' : ''}>${escapeHtml(c)}</option>`).join('');
     }
 
-    // Login Handler
     async function handleLogin(e) {
         e.preventDefault();
         const usernameOrEmail = document.getElementById('login-username').value.trim();
@@ -298,7 +277,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Register Handler
     async function handleRegister(e) {
         e.preventDefault();
         const username = document.getElementById('reg-username').value.trim();
@@ -322,7 +300,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Save Student (Add / Edit)
     async function handleSaveStudent(e) {
         e.preventDefault();
         const id = studentIdInput.value;
@@ -348,7 +325,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Edit Modal Helper
     window.editStudent = (id) => {
         const student = studentsCache.find(s => s.id === id);
         if (!student) return;
@@ -364,7 +340,6 @@ document.addEventListener('DOMContentLoaded', () => {
         openModal(studentModal);
     };
 
-    // Confirm Delete Helper
     window.confirmDeleteStudent = (id, name) => {
         if (!jwtToken) {
             showToast('Please login to delete students.', 'error');
@@ -408,7 +383,6 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchStudents();
     }
 
-    // Modal Helpers
     function openModal(modal) { modal.classList.remove('hidden'); }
     function closeModal(modal) { modal.classList.add('hidden'); }
     function showLoading(show) {
@@ -420,7 +394,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Utilities
     function getInitials(name) {
         if (!name) return 'S';
         const parts = name.trim().split(' ');

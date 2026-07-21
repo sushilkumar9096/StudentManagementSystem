@@ -25,7 +25,6 @@ namespace Student.Tests
         [Fact]
         public async Task RegisterAsync_WithValidData_ShouldCreateUserAndReturnToken()
         {
-            // Arrange
             var registerDto = new RegisterDto
             {
                 Username = "newuser",
@@ -41,10 +40,8 @@ namespace Student.Tests
             _mockJwtTokenGenerator.Setup(j => j.GenerateToken(It.IsAny<User>()))
                 .Returns(("fake_jwt_token_string", DateTime.UtcNow.AddHours(2)));
 
-            // Act
             var response = await _authService.RegisterAsync(registerDto);
 
-            // Assert
             response.Should().NotBeNull();
             response.Success.Should().BeTrue();
             response.StatusCode.Should().Be(201);
@@ -55,7 +52,6 @@ namespace Student.Tests
         [Fact]
         public async Task RegisterAsync_WithExistingUsername_ShouldThrowConflictException()
         {
-            // Arrange
             var registerDto = new RegisterDto
             {
                 Username = "existinguser",
@@ -65,10 +61,8 @@ namespace Student.Tests
 
             _mockUserRepository.Setup(r => r.GetByUsernameAsync("existinguser")).ReturnsAsync(new User { Id = 1, Username = "existinguser" });
 
-            // Act
             Func<Task> act = async () => await _authService.RegisterAsync(registerDto);
 
-            // Assert
             await act.Should().ThrowAsync<ConflictException>()
                 .WithMessage("*already taken*");
         }
@@ -76,7 +70,6 @@ namespace Student.Tests
         [Fact]
         public async Task LoginAsync_WithValidCredentials_ShouldReturnAuthToken()
         {
-            // Arrange
             var rawPassword = "SecretPassword123!";
             var passwordHash = BCrypt.Net.BCrypt.HashPassword(rawPassword);
 
@@ -99,10 +92,8 @@ namespace Student.Tests
             _mockJwtTokenGenerator.Setup(j => j.GenerateToken(user))
                 .Returns(("valid_jwt_token", DateTime.UtcNow.AddHours(2)));
 
-            // Act
             var response = await _authService.LoginAsync(loginDto);
 
-            // Assert
             response.Should().NotBeNull();
             response.Success.Should().BeTrue();
             response.Data!.Token.Should().Be("valid_jwt_token");
@@ -111,7 +102,6 @@ namespace Student.Tests
         [Fact]
         public async Task LoginAsync_WithInvalidPassword_ShouldThrowUnauthorizedAccessException()
         {
-            // Arrange
             var passwordHash = BCrypt.Net.BCrypt.HashPassword("CorrectPassword123!");
 
             var user = new User
@@ -129,10 +119,8 @@ namespace Student.Tests
 
             _mockUserRepository.Setup(r => r.GetByUsernameOrEmailAsync("testuser")).ReturnsAsync(user);
 
-            // Act
             Func<Task> act = async () => await _authService.LoginAsync(loginDto);
 
-            // Assert
             await act.Should().ThrowAsync<Core.Exceptions.UnauthorizedAccessException>()
                 .WithMessage("*Invalid username/email or password*");
         }

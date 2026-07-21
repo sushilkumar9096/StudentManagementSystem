@@ -17,11 +17,6 @@ namespace Student.Api.Controllers
             _authService = authService;
         }
 
-        /// <summary>
-        /// Register a new user
-        /// </summary>
-        /// <param name="registerDto">User registration details</param>
-        /// <returns>Auth token and user details</returns>
         [HttpPost("register")]
         [ProducesResponseType(typeof(ApiResponse<AuthResponseDto>), StatusCodes.Status201Created)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status400BadRequest)]
@@ -38,11 +33,6 @@ namespace Student.Api.Controllers
             return StatusCode(result.StatusCode, result);
         }
 
-        /// <summary>
-        /// Authenticate user and get JWT token
-        /// </summary>
-        /// <param name="loginDto">User login credentials</param>
-        /// <returns>Auth token and user details</returns>
         [HttpPost("login")]
         [ProducesResponseType(typeof(ApiResponse<AuthResponseDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<object>), StatusCodes.Status401Unauthorized)]
