@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Management System - Zest India</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="app-background">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="blob blob-3"></div>
+    </div>
+
+    <div class="app-container">
+        <!-- Navigation Header -->
+        <header class="navbar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <i class="fa-solid fa-graduation-cap"></i>
+                </div>
+                <div class="logo-text">
+                    <h2>Zest<span class="highlight">Edu</span></h2>
+                    <p>Student Management System</p>
+                </div>
+            </div>
+
+            <div class="user-status-container">
+                <div id="auth-status-badge" class="status-badge logged-out">
+                    <span class="status-dot"></span>
+                    <span id="status-text">Guest Mode</span>
+                </div>
+
+                <div id="user-info" class="user-info hidden">
+                    <span id="logged-user-name">Admin</span>
+                    <span id="logged-user-role" class="role-pill">Admin</span>
+                </div>
+
+                <button id="auth-btn" class="btn btn-outline">
+                    <i class="fa-solid fa-right-to-bracket"></i>
+                    <span>Login</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content Grid -->
+        <main class="main-content">
+            <!-- Hero / Metrics Section -->
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="card-icon bg-indigo">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div class="card-details">
+                        <h3>Total Students</h3>
+                        <p id="metric-total-students">0</p>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="card-icon bg-emerald">
+                        <i class="fa-solid fa-book-open"></i>
+                    </div>
+                    <div class="card-details">
+                        <h3>Active Courses</h3>
+                        <p id="metric-total-courses">0</p>
+                    </div>
+                </div>
+
+                <div class="metric-card">
+                    <div class="card-icon bg-amber">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </div>
+                    <div class="card-details">
+                        <h3>Average Age</h3>
+                        <p id="metric-avg-age">0.0</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Table Container -->
+            <section class="glass-panel main-panel">
+                <!-- Action Controls Bar -->
+                <div class="controls-bar">
+                    <div class="search-filter-group">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                            <input type="text" id="search-input" placeholder="Search by name or email...">
+                        </div>
+
+                        <div class="filter-box">
+                            <select id="course-filter">
+                                <option value="">All Courses</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <a href="/swagger" target="_blank" class="btn btn-secondary" title="Open Swagger API Docs">
+                            <i class="fa-solid fa-code"></i>
+                            <span>Swagger Docs</span>
+                        </a>
+
+                        <button id="refresh-btn" class="btn btn-icon" title="Refresh Table">
+                            <i class="fa-solid fa-rotate"></i>
+                        </button>
+
+                        <button id="add-student-btn" class="btn btn-primary">
+                            <i class="fa-solid fa-plus"></i>
+                            <span>Add Student</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Students Data Table -->
+                <div class="table-responsive">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Student Info</th>
+                                <th>Age</th>
+                                <th>Course Enrolled</th>
+                                <th>Registration Date</th>
+                                <th class="text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="student-table-body">
+                            <!-- Injected via JavaScript -->
+                        </tbody>
+                    </table>
+
+                    <div id="table-loading" class="table-state">
+                        <div class="spinner"></div>
+                        <p>Loading students records...</p>
+                    </div>
+
+                    <div id="table-empty" class="table-state hidden">
+                        <i class="fa-solid fa-folder-open empty-icon"></i>
+                        <h3>No Students Found</h3>
+                        <p>Try clearing your search filters or add a new student record.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Auth Modal -->
+    <div id="auth-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="auth-modal-title">Sign In to ZestEdu</h3>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+
+            <div class="tab-switcher">
+                <button id="tab-login" class="tab-btn active">Login</button>
+                <button id="tab-register" class="tab-btn">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="login-form" class="modal-form">
+                <div class="form-group">
+                    <label for="login-username">Username or Email</label>
+                    <input type="text" id="login-username" required placeholder="admin or admin@zestindia.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="login-password">Password</label>
+                    <input type="password" id="login-password" required placeholder="••••••••">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span>Login</span>
+                </button>
+                
+                <p class="demo-credentials">
+                    <i class="fa-solid fa-circle-info"></i> Demo Admin: <code>admin</code> / <code>Admin@123</code>
+                </p>
+            </form>
+
+            <!-- Register Form -->
+            <form id="register-form" class="modal-form hidden">
+                <div class="form-group">
+                    <label for="reg-username">Username</label>
+                    <input type="text" id="reg-username" required placeholder="e.g. sushil_dev">
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-email">Email Address</label>
+                    <input type="email" id="reg-email" required placeholder="e.g. sushil@example.com">
+                </div>
+
+                <div class="form-group">
+                    <label for="reg-password">Password</label>
+                    <input type="password" id="reg-password" required placeholder="At least 6 characters">
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-block">
+                    <span>Create Account</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Student Form Modal (Add / Edit) -->
+    <div id="student-modal" class="modal-backdrop hidden">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 id="student-modal-title">Add New Student</h3>
+                <button class="close-modal-btn">&times;</button>
+            </div>
+
+            <form id="student-form" class="modal-form">
+                <input type="hidden" id="student-id">
+
+                <div class="form-group">
+                    <label for="student-name">Full Name *</label>
+                    <input type="text" id="student-name" required placeholder="e.g. Aarav Sharma">
+                </div>
+
+                <div class="form-group">
+                    <label for="student-email">Email Address *</label>
+                    <input type="email" id="student-email" required placeholder="e.g. aarav.sharma@example.com">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="student-age">Age *</label>
+                        <input type="number" id="student-age" min="1" max="120" required placeholder="e.g. 21">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="student-course">Course *</label>
+                        <input type="text" id="student-course" required placeholder="e.g. Computer Science">
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline cancel-modal-btn">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <span id="student-submit-label">Save Student</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="modal-backdrop hidden">
+        <div class="modal-card text-center">
+            <div class="danger-icon-badge">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3>Delete Student Record?</h3>
+            <p>Are you sure you want to delete <strong id="delete-student-name">this student</strong>? This action cannot be undone.</p>
+
+            <div class="modal-footer justify-center">
+                <button type="button" class="btn btn-outline cancel-modal-btn">Cancel</button>
+                <button id="confirm-delete-btn" class="btn btn-danger">Delete Permanently</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notifications Container -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <!-- Application JavaScript -->
+    <script src="js/app.js"></script>
+</body>
+</html>
