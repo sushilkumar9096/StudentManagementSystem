@@ -101,12 +101,7 @@ namespace Student.Api
                 {
                     Title = "Student Management API",
                     Version = "v1",
-                    Description = "RESTful API for Student Management System - Zest India Technical Assignment",
-                    Contact = new OpenApiContact
-                    {
-                        Name = "Zest India Candidate",
-                        Email = "candidate@zestindia.com"
-                    }
+                    Description = "RESTful API for Student Management System - Zest India Technical Assignment"
                 });
 
                 // Add JWT Security Definition to Swagger UI
